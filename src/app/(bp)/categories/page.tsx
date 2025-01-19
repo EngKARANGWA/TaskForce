@@ -35,10 +35,15 @@ export default async function CategoriesPage() {
             onSubmit={async (data) => {
               'use server';
               if (!user?.id) return;
-              await createCategory({
-                ...data,
-                kindeId: user.id,
-              });
+              if (data.name) {
+                await createCategory({
+                  ...data,
+                  name: data.name || "", // Ensure name is always a string
+                  kindeId: user.id,
+                });
+              } else {
+                console.error("Category name is required");
+              }
             }}
           />
         </div>
