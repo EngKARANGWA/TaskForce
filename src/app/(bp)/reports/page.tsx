@@ -10,7 +10,13 @@ export default async function ReportsPage() {
   const user = await getUser();
 
   if (!user?.id) {
-    return <h2 className="text-2xl font-bold text-center mt-6">Please log in to continue</h2>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-200">
+        <h2 className="text-2xl font-bold text-center mt-6 text-gray-700">
+          Please log in to continue
+        </h2>
+      </div>
+    );
   }
 
   try {
@@ -24,24 +30,27 @@ export default async function ReportsPage() {
 
     // Render report
     return (
-      <div className="space-y-6 px-6 py-4">
-        <h1 className="text-3xl font-bold text-gray-800">Financial Report</h1>
-        <TransactionTable
-        //@ts-ignore
-          transactions={transactions}
-          onGenerateReport={async (format) => {
-            "use server";
-            if (!user?.id) return;
+      <div className="bg-gradient-to-br mt-20 from-blue-50 via-white to-blue-100 min-h-screen py-8 px-6">
+        <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-lg p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">Financial Report</h1>
+          
+          <TransactionTable
+            //@ts-ignore
+            transactions={transactions}
+            onGenerateReport={async (format) => {
+              "use server";
+              if (!user?.id) return;
 
-            // Trigger report generation
-            await generateReport({
-              kindeId: user.id,
-              startDate: new Date().toISOString(),
-              endDate: new Date().toISOString(),
-              format,
-            });
-          }}
-        />
+              // Trigger report generation
+              await generateReport({
+                kindeId: user.id,
+                startDate: new Date().toISOString(),
+                endDate: new Date().toISOString(),
+                format,
+              });
+            }}
+          />
+        </div>
       </div>
     );
   } catch (error) {
@@ -49,11 +58,13 @@ export default async function ReportsPage() {
 
     // Render error message
     return (
-      <div className="text-center py-10">
-        <h2 className="text-2xl font-bold text-red-600">Something went wrong</h2>
-        <p className="text-gray-700 mt-2">
-          We could not load your financial report. Please try again later.
-        </p>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-100 to-red-200">
+        <div className="text-center py-10 bg-white p-6 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-red-600">Something went wrong</h2>
+          <p className="text-gray-700 mt-2">
+            We could not load your financial report. Please try again later.
+          </p>
+        </div>
       </div>
     );
   }

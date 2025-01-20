@@ -33,7 +33,7 @@ export default function TopHeader() {
       href: "/budget",
       label: "Budgets",
       icon: BarChart2,
-      gradient: "from-yellow-500 to-yellow-700",
+      gradient: "from-green-500 to-yellow-200",
     },
     {
       href: "/transactions",
@@ -76,7 +76,7 @@ export default function TopHeader() {
             <Home className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-gray-800">WalletPro</h1>
+            <h1 className="text-lg font-bold text-gray-800">EWallet</h1>
             <p className="text-sm text-gray-500">Financial Management</p>
           </div>
         </div>

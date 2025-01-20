@@ -13,8 +13,8 @@ export default async function TransactionsPage() {
 
   if (!user) {
     return (
-      <div>
-        <h2 className="text-2xl mb-2">User not authenticated</h2>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-blue-50">
+        <h2 className="text-2xl font-semibold text-center text-gray-700">User not authenticated</h2>
       </div>
     );
   }
@@ -70,51 +70,54 @@ export default async function TransactionsPage() {
     }
 
     return (
-      <div>
-        <h1 className="text-2xl mb-4">Transactions</h1>
-        <div className="grid grid-cols-1 gap-4">
-          {transactions.map((transaction) => (
-            <Card key={transaction.id}>
-              <div className="flex justify-between p-4">
-                <div>
-                  <h2 className="text-xl font-bold">{transaction.description}</h2>
-                  <p className="text-gray-500">
-                    {new Intl.NumberFormat('en-US', {
-                      style: 'currency',
-                      currency: accounts.find(a => a.id === transaction.accountId)?.currency || 'USD'
-                    }).format(Number(transaction.amount))}
-                  </p>
-                  <p className="text-gray-500">
-                    {transaction.date ? new Date(transaction.date).toLocaleDateString() : "No date"}
-                  </p>
-                </div>
-                <div
-                  className={`px-2 py-1 rounded-md ${
-                    transaction.type === 'INCOME' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {transaction.type}
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-10 px-6 mt-20">
+        <div className="max-w-5xl mx-auto bg-white shadow-2xl rounded-lg p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">Transactions</h1>
 
-        <div className="mt-8">
-          <TransactionForm
-          //@ts-ignore
-            accounts={accounts}
-            //@ts-ignore
-            categories={categories}
-            onSubmit={handleSubmit}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {transactions.map((transaction) => (
+              <Card key={transaction.id} className="hover:shadow-lg transition-shadow duration-300">
+                <div className="flex justify-between items-center p-6">
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-800">{transaction.description}</h2>
+                    <p className="text-gray-600 mt-2">
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: accounts.find(a => a.id === transaction.accountId)?.currency || 'USD'
+                      }).format(Number(transaction.amount))}
+                    </p>
+                    <p className="text-gray-500 text-sm">
+                      {transaction.date ? new Date(transaction.date).toLocaleDateString() : "No date"}
+                    </p>
+                  </div>
+                  <div
+                    className={`px-3 py-1 text-sm rounded-md ${
+                      transaction.type === 'INCOME'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {transaction.type}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-8">
+            <TransactionForm
+              //@ts-ignore
+              accounts={accounts}
+              //@ts-ignore
+              categories={categories}
+              onSubmit={handleSubmit}
+            />
+          </div>
         </div>
       </div>
     );
   } catch (error) {
     console.error("Error fetching transactions data:", error);
-    return <p className="text-red-500">An error occurred while loading transactions.</p>;
+    return <p className="text-red-500 text-center mt-6">An error occurred while loading transactions.</p>;
   }
 }

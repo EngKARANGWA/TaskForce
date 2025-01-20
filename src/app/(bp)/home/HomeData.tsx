@@ -115,8 +115,8 @@ export default function HomePage({
 
   return (
       <div className="p-6 space-y-8">
-        <div className="flex flex-wrap justify-between items-center bg-gradient-to-r from-green-500 to-yellow-300 text-white p-4 rounded-md shadow-lg">
-          <h1 className="text-4xl font-bold">WalletPro</h1>
+        <div className="flex flex-wrap justify-between items-center bg-gradient-to-r from-green-500 text-white mt-24 p-4 rounded-md shadow-lg">
+          <h1 className="text-4xl font-bold">EWallet</h1>
           <div className="text-right">
             <p className="text-sm font-light">Welcome back,</p>
             <p className="text-lg font-semibold">{user.given_name}</p>
