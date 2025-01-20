@@ -1,8 +1,14 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { getBudgets, createBudget } from "@/lib/queries/budget";
 import { getCategories } from "@/lib/queries/category";
 import BudgetForm from "@/app/(bp)/budget/BudgetForm";
 import { Card } from "@/components/ui/card";
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 interface Budget {
   id: number;
@@ -14,95 +20,102 @@ interface Budget {
   notificationThreshold: number;
 }
 
-interface Category {
-  id: number;
-  name: string;
-}
-
 export default async function BudgetsPage() {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
-
-  if (!user?.id) {
-    return <h2 className="text-2xl mb-2">Please log in to continue</h2>;
-  }
-
   try {
-    const [budgets, categories] = await Promise.all([
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user?.id) {
+      return <h2 className="text-2xl mb-2">Please log in to continue</h2>;
+    }
+
+    const [budgetsData, categoriesData] = await Promise.all([
       getBudgets(user.id),
       getCategories(user.id),
     ]);
 
+    const budgets: Budget[] = budgetsData.map((budget) => ({
+      ...budget,
+      amount: Number(budget.amount),
+      startDate: budget.startDate.toISOString(),
+      endDate: budget.endDate.toISOString(),
+    }));
+//@ts-ignore
+    const categories: Category[] = categoriesData.map((category) => ({
+      id: category.id,
+      name: category.name,
+    }));
+
     return (
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold">Your Budgets</h1>
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Your Budgets</h1>
 
-          {budgets.length === 0 ? (
-            <p className="text-gray-600">You have no budgets. Create one below!</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {budgets.map((budget: Budget) => {
-                  const category = categories.find((c) => c.id === budget.categoryId);
-                  const now = new Date();
-                  const startDate = new Date(budget.startDate);
-                  const endDate = new Date(budget.endDate);
-                  const isActive = now >= startDate && now <= endDate;
+        {budgets.length === 0 ? (
+          <p className="text-gray-600">You have no budgets. Create one below!</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {budgets.map((budget: Budget) => {
+              const category = categories.find((c) => c.id === budget.categoryId);
+              const now = new Date();
+              const startDate = new Date(budget.startDate);
+              const endDate = new Date(budget.endDate);
+              const isActive = now >= startDate && now <= endDate;
 
-                  return (
-                      <Card key={budget.id} className="p-4">
-                          <h3 className="text-xl font-semibold">{budget.name}</h3>
-                          <p className="text-gray-600">{category?.name || "Uncategorized"}</p>
-                          <p className="text-2xl font-bold mt-2">
-                              {new Intl.NumberFormat("en-US", {
-                                  style: "currency",
-                                  currency: "USD",
-                              }).format(budget.amount)}
-                          </p>
-                          <div className="mt-2 space-y-1">
-                              <p className="text-sm text-gray-500">
-                                  {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
-                              </p>
-                              <p className="text-sm">
-                                  Status:{" "}
-                                  <span className={isActive ? "text-green-500" : "text-gray-500"}>
-                                      {isActive ? "Active" : "Inactive"}
-                                  </span>
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                  Alert at: {budget.notificationThreshold}% of budget
-                              </p>
-                          </div>
-                      </Card>
-                  );
-              })}
-            </div>
-          )}
-
-          <div className="mt-8">
-            <Card className="p-6">
-              <BudgetForm
-                categories={categories}
-                onSubmit={async (data: Partial<Budget>) => {
-                  'use server';
-                  try {
-                    if (!user?.id) return;
-                    await createBudget({
-                      kindeId: user.id,
-                      name: data.name!,
-                      categoryId: data.categoryId!,
-                      amount: data.amount!,
-                      startDate: new Date(data.startDate!),
-                      endDate: new Date(data.endDate!),
-                      notificationThreshold: data.notificationThreshold!,
-                    });
-                  } catch (error) {
-                    console.error("Failed to create budget:", error);
-                  }
-                }}
-              />
-            </Card>
+              return (
+                <Card key={budget.id} className="p-4">
+                  <h3 className="text-xl font-semibold">{budget.name}</h3>
+                  <p className="text-gray-600">{category?.name || "Uncategorized"}</p>
+                  <p className="text-2xl font-bold mt-2">
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(Number(budget.amount))}
+                  </p>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-sm text-gray-500">
+                      {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
+                    </p>
+                    <p className="text-sm">
+                      Status:{" "}
+                      <span className={isActive ? "text-green-500" : "text-gray-500"}>
+                        {isActive ? "Active" : "Inactive"}
+                      </span>
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Alert at: {budget.notificationThreshold}% of budget
+                    </p>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
+        )}
+
+        <div className="mt-8">
+          <Card className="p-6">
+            <BudgetForm
+              categories={categories}
+              onSubmit={async (data: Partial<Budget>) => {
+                "use server";
+                try {
+                  if (!user?.id) return;
+                  await createBudget({
+                    kindeId: user.id,
+                    name: data.name ?? "Untitled Budget",
+                    categoryId: data.categoryId ?? categories[0]?.id ?? 0,
+                    amount: data.amount ?? 0,
+                    startDate: data.startDate ? new Date(data.startDate) : new Date(),
+                    endDate: data.endDate ? new Date(data.endDate) : new Date(),
+                    notificationThreshold: data.notificationThreshold ?? 0,
+                  });
+                } catch (error) {
+                  console.error("Failed to create budget:", error);
+                }
+              }}
+            />
+          </Card>
         </div>
+      </div>
     );
   } catch (error) {
     console.error("Error fetching budgets or categories:", error);

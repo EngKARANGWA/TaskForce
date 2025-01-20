@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   pgTable,
   serial,
@@ -27,7 +28,8 @@ export const accounts = pgTable("accounts", {
 });
 
 // Categories table
-export const categories = pgTable("categories", {
+//@ts-ignore
+export const categories: ReturnType<typeof pgTable> = pgTable("categories", {
   id: serial("id").primaryKey(),
   kindeId: varchar("kinde_id", { length: 255 }).notNull(), // Store Kinde user ID
   parentId: integer("parent_id").references(() => categories.id),

@@ -20,10 +20,10 @@ export default async function CategoriesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((category) => (
-            <div key={category.id} className="p-4 border rounded-md">
-              <h3 className="text-xl font-semibold">{category.name}</h3>
-              <p className="text-gray-600">{category.description}</p>
-              {category.parentId && (
+            <div key={category.id as string | number} className="p-4 border rounded-md">
+              <h3 className="text-xl font-semibold">{category.name as string}</h3>
+              <p className="text-gray-600">{category.description as string}</p>
+              {typeof category.parentId === 'string' && (
                 <p className="text-gray-500">Parent ID: {category.parentId}</p>
               )}
             </div>

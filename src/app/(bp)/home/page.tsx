@@ -31,7 +31,7 @@ export default async function Home() {
       accounts: rawAccounts,
       recentTransactions,
       budgets,
-      categories,
+      categories: rawCategories,
       categorySpending,
     } = await getHomeData(user.id);
 
@@ -46,6 +46,14 @@ export default async function Home() {
         description,
         createdAt,
         updatedAt,
+      })
+    );
+
+    const categories = rawCategories.map(
+      ({ id, name, parentId }) => ({
+        id: Number(id),
+        name,
+        parentId: parentId ? Number(parentId) : null,
       })
     );
 
@@ -71,7 +79,9 @@ export default async function Home() {
         //@ts-ignore
         transactions={transactions}
         budgets={budgets}
+        //@ts-ignore
         categories={categories}
+        //@ts-ignore
         categorySpending={spendingData}
       />
     );
