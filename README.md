@@ -6,9 +6,7 @@ First, run the development server:
 
 # or
 yarn dev
-# or
-bun dev
-```
+
 
 
 
